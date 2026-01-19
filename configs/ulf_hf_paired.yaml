@@ -1,0 +1,94 @@
+model_args:
+  # For 2D slices, use spatial_dims: 2
+  # For 3D volumes, use spatial_dims: 3 (requires more GPU memory)
+  spatial_dims: 2
+  
+  # Number of input channels (1 for grayscale MRI)
+  in_channels: 1
+  
+  # Number of output channels (1 for generating HF MRI)
+  out_channels: 1
+  
+  # Number of residual blocks at each UNet level
+  num_res_blocks: [2, 2, 2, 2, 2]
+  
+  # Number of channels at each UNet level
+  num_channels: [32, 64, 128, 256, 512]
+  
+  # Defines which levels incorporate attention layers
+  attention_levels: [False, False, True, True, True]
+  
+  # Number of groups for Group Normalization
+  norm_num_groups: 32
+  
+  # Whether to include up/down sampling in residual blocks
+  resblock_updown: True
+  
+  # Number of channels in each attention head
+  num_head_channels: [32, 64, 128, 256, 512]
+  
+  # Number of transformer layers for cross-attention
+  transformer_num_layers: 6
+  
+  # Use flash attention for efficiency
+  use_flash_attention: true
+  
+  # Enable conditioning (using ULF as condition for HF generation)
+  with_conditioning: True
+  
+  # Dimensionality for cross-attention embeddings (1 class: HF-ULF-pair)
+  cross_attention_dim: 1
+  
+  # Use mask conditioning - the ULF image serves as the conditioning mask
+  mask_conditioning: true
+  
+  # Conditioning embedding channels for ControlNet
+  conditioning_embedding_num_channels: [16]
+
+general_args:
+  # Enable mask conditioning (ULF image as condition)
+  mask_conditioning: true
+
+  # Disable class conditioning since we only have one pair type
+  class_conditioning: false
+
+data_args:
+  # Path to your generated pickle file
+  pickle_path: "data/ulf_hf_paired.pkl"
+  
+  # Split names in the pickle file
+  split_train: "train"
+  split_val: "valid"
+  split_test: "test"
+
+train_args:
+  # Number of training epochs
+  num_epochs: 200
+  
+  # Batch size (adjust based on your GPU memory)
+  batch_size: 8
+  
+  # Learning rate
+  lr: 1.0e-4
+  
+  # Checkpoint directory
+  checkpoint_dir: "checkpoints/ulf_hf_paired"
+  
+  # Device to use
+  device: "cuda"
+  
+  # Print training info every N epochs
+  print_every: 1
+  
+  # Validation frequency (epochs)
+  val_freq: 5
+  
+  # Number of validation samples to save
+  num_val_samples: 5
+
+inference_args:
+  # Number of ODE solver steps (5-10 is usually good for flow matching)
+  num_inference_steps: 10
+  
+  # Output directory for generated samples
+  output_dir: "outputs/ulf_hf_paired"
