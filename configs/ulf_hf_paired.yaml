@@ -1,7 +1,7 @@
 model_args:
   # For 2D slices, use spatial_dims: 2
   # For 3D volumes, use spatial_dims: 3 (requires more GPU memory)
-  spatial_dims: 2
+  spatial_dims: 3
   
   # Number of input channels (1 for grayscale MRI)
   in_channels: 1
@@ -52,9 +52,19 @@ general_args:
   # Disable class conditioning since we only have one pair type
   class_conditioning: false
 
+solver_args:
+  # ODE solver method: "euler", "midpoint", "rk4", "dopri5"
+  method: "midpoint"
+  
+  # Step size for the solver
+  step_size: 0.02
+  
+  # Number of time points for solving (more = higher quality but slower)
+  time_points: 10
+
 data_args:
   # Path to your generated pickle file
-  pickle_path: "data/ulf_hf_paired.pkl"
+  pickle_path: "data/ulf_hf_paired_3d.pkl"
   
   # Split names in the pickle file
   split_train: "train"
@@ -65,8 +75,8 @@ train_args:
   # Number of training epochs
   num_epochs: 200
   
-  # Batch size (adjust based on your GPU memory)
-  batch_size: 8
+  # Batch size (adjust based on your GPU memory - use 1-2 for 3D)
+  batch_size: 1
   
   # Learning rate
   lr: 1.0e-4

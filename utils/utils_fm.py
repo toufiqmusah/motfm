@@ -106,8 +106,13 @@ def build_model(model_config: dict, device: torch.device = None) -> MergedModel:
         # Ensure the controlnet has its specific key.
         if cond_embed_channels is None:
             cond_embed_channels = (16,)
-        # Pass the same config kwargs to ControlNet plus the controlnet-specific key.
-        controlnet = ControlNet(**mc, conditioning_embedding_num_channels=cond_embed_channels)
+        
+        # ControlNet doesn't accept 'out_channels' - create a config without it
+        controlnet_config = mc.copy()
+        controlnet_config.pop("out_channels", None)  # Remove out_channels if present
+        
+        # Pass the config kwargs to ControlNet plus the controlnet-specific key.
+        controlnet = ControlNet(**controlnet_config, conditioning_embedding_num_channels=cond_embed_channels)
         controlnet.load_state_dict(unet.state_dict(), strict=False)
 
     model = MergedModel(unet=unet, controlnet=controlnet, max_timestep=max_timestep)
