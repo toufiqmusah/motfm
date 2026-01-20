@@ -92,23 +92,19 @@ def load_and_prepare_data(
     image_list, mask_list, class_list = [], [], []
     for entry in data_split:
         # Load and normalize the image
-        image = torch.tensor(entry["image"], dtype=torch.float32)  # [1, H, W]
+        image = torch.tensor(entry["image"], dtype=torch.float32)  # [C, H, W] or [C, D, H, W]
         image_list.append(image)
 
-        mask = torch.tensor(entry["mask"], dtype=torch.float32)  # [1, H, W]
+        mask = torch.tensor(entry["mask"], dtype=torch.float32)  # [C, H, W] or [C, D, H, W]
         mask_list.append(mask)
 
         class_list.append(entry["class"])  # each is a string
 
-    # Concatenate images and masks
-    Images = torch.cat(image_list, dim=0)  # [N, H, W]
-    assert Images.dim() == 3, f"Expected 3D tensor, got {Images.shape}"
-    Images = Images.unsqueeze(1)  # [N, 1, H, W]
+    # Stack images and masks (adds batch dimension)
+    Images = torch.stack(image_list, dim=0)  # [N, C, H, W] or [N, C, D, H, W]
     Images = normalize_zero_to_one(Images)
 
-    Masks = torch.cat(mask_list, dim=0)  # [N, H, W]
-    assert Masks.dim() == 3, f"Expected 3D tensor, got {Masks.shape}"
-    Masks = Masks.unsqueeze(1)  # [N, 1, H, W]
+    Masks = torch.stack(mask_list, dim=0)  # [N, C, H, W] or [N, C, D, H, W]
 
     if new_masking:
         # Apply new masking logic if required

@@ -33,11 +33,11 @@ model_args:
   # Use flash attention for efficiency
   use_flash_attention: true
   
-  # Enable conditioning (using ULF as condition for HF generation)
-  with_conditioning: True
+  # Disable cross-attention conditioning (only using mask/ControlNet conditioning)
+  with_conditioning: False
   
-  # Dimensionality for cross-attention embeddings (1 class: HF-ULF-pair)
-  cross_attention_dim: 1
+  # Not used when with_conditioning is False
+  # cross_attention_dim: 1
   
   # Use mask conditioning - the ULF image serves as the conditioning mask
   mask_conditioning: true
